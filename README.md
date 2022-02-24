@@ -1,4 +1,4 @@
-# dotnet-az-snapshot-tool
+# az-snapshot (A Fork of dotnet-az-snapshot-tool)
 
 Command line tool that creates Azure managed disk snapshots.
 
@@ -6,7 +6,7 @@ Main motivation was to be able to automate the creation of snapshots **without**
 
 ## Installation
 
-`dotnet tool install --global dotnet-az-snapshot-tool`
+`dotnet tool install --global az-snapshot`
 
 ## Usage
 
@@ -14,28 +14,30 @@ Available arguments:
 
 - **--tenantId (-t)**: (Required) Azure Tenant ID of the user credentials used to create the snapshot.
 - **--subscriptionId (-s)**: (Required) Azure subscription ID of the source disk for the snapshot.
-- **--resourceGroup (-g)**: (Required) Resource group of the source disk for the snapshot. 
-- **--diskName (-n)**: (Required) Name of the source managed disk name. 
-- **--snapshotNameFormat (-f)**: Defines the name of the snapshot resource.  Default is 'diskName-snapshot-yy-MM-dd.hh.mm.ss'.
+- **--resourceGroup (-g)**: (Required) Resource group of the source disk for the snapshot.
+- **--targetsubscriptionId (-i)**: (Required) Azure subscription ID of the target resource group for the snapshot.
+- **--targetresourceGroup (-o)**: (Required) Resource group in which the snapshot will be created.
+- **--diskName (-n)**: (Required) Name of the source managed disk name. (ex: pvc-xxxx-xxxx-xxxxxxx) 
+- **--snapshotNameFormat (-f)**: (Required) Defines the name of the snapshot resource.  Default is 'diskName_yy-MM-dd.hh.mm.ss'.
 - **--retainLimit (-l)**: Limits the retained snapshots to specified count.  Default is unlimited (0).
 - **--skuType (-k)**: Snapshot sku type.  Available values are 'Standard_LRS' or 'Premium_LRS'. Default is 'Standard_LRS'..
 
 ### Example
 
 ```shell script
-az-snapshot-tool create --tenantId xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --subscriptionId xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --resourceGroup myRg --diskName myDisk
+az-snapshot --tenantId xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --subscriptionId xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --targetsubscriptionId xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --resourceGroup disksourcerg --targetresourceGroup targetsnapshotrg --diskName pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --snapshotName testsnapshot
 ```
 
 or
 
 ```shell script
-az-snapshot-tool create -t xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -s xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -g myRg -n myDisk
+az-snapshot -t xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -s xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -i xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -g disksourcerg -o targetsnapshotrg -n pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -f testsnapshot
 ```
 
 To retain 7 latest snapshot values (including latest):
 
 ```shell script
-az-snapshot-tool create -t xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -s xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -g myRg -n myDisk --retainLimit 7
+az-snapshot -t xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -s xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -i xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -g disksourcerg -o targetsnapshotrg -n pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -f testsnapshot --retainLimit 7
 ```
 
 ### Details on authentication
@@ -72,8 +74,11 @@ spec:
                 ./az-snapshot-tool run
                 -t xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
                 -s xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
-                -g myRg
-                -n myDisk
+                -i xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+                -o targetsnapshotrg 
+                -g disksourcerg
+                -n pvc-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+                -f data-test-0
                 -l 7
             env:
             - name: AZURE_TENANT_ID
@@ -87,7 +92,3 @@ spec:
                   key: mySecretKey
           restartPolicy: OnFailure
 ```
-
-## License
-
-Copyright © 2020, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
