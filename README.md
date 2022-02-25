@@ -18,7 +18,7 @@ Available arguments:
 - **--targetsubscriptionId (-i)**: (Required) Azure subscription ID of the target resource group for the snapshot.
 - **--targetresourceGroup (-o)**: (Required) Resource group in which the snapshot will be created.
 - **--diskName (-n)**: (Required) Name of the source managed disk name. (ex: pvc-xxxx-xxxx-xxxxxxx) 
-- **--snapshotNameFormat (-f)**: (Required) Defines the name of the snapshot resource.
+- **--snapshotName (-f)**: (Required) Defines the name of the snapshot resource.
 - **--retainLimit (-l)**: Limits the retained snapshots to specified count.  Default is unlimited (0).
 - **--skuType (-k)**: Snapshot sku type.  Available values are 'Standard_LRS' or 'Premium_LRS'. Default is 'Standard_LRS'..
 
